@@ -13,3 +13,7 @@ sudo bash spinup.sh
 - Enter number of worker (Agent) node required. Minimum 1 recommended. 1Gi + 1Gi per worker node free memory is recommended.
 
 - Enter kubernetes API port on which K8s will listen. Must be an unused port.
+
+To find manual steps, read this article:
+
+<https://medium.com/linux-shots/spin-up-a-lightweight-kubernetes-cluster-on-linux-with-k3s-metallb-and-nginx-ingress-167d98f3583d>
