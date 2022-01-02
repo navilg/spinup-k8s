@@ -201,7 +201,7 @@ echo "To stop this cluster (If running), run: k3d cluster stop $clusterName"
 echo "To start this cluster (If stopped), run: k3d cluster start $clusterName"
 echo "To delete this cluster, run: k3d cluster delete $clusterName"
 echo "To list all clusters, run: k3d cluster list"
-echo "To switch to another cluster (In case of multiple clusters), run: kubectl config use-context CLUSTERNAME"
+echo "To switch to another cluster (In case of multiple clusters), run: kubectl config use-context k3d-<CLUSTERNAME>"
 echo "---------------------------------------------------------------------------"
 echo "---------------------------------------------------------------------------"
 echo
