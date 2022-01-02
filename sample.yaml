@@ -17,7 +17,7 @@ data:
     </head>
     <body>
       <h1>Welcome !!</h1>
-      <p>Your lightweight kubernetes is working fine.</p>
+      <p>Your lightweight kubernetes cluster is setup successfully.</p>
     </body>
     </html>
 

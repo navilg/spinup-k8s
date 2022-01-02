@@ -2,6 +2,8 @@
 
 set -e
 
+export KUBECONFIG=/home/$SUDO_USER/.kube/config
+
 function exitWithMsg()
 {
     # $1 is error code
@@ -10,11 +12,24 @@ function exitWithMsg()
     exit $1
 }
 
+function clean()
+{
+    # $1 is error code
+    echo "Cleaning up, before exiting..."
+    if [[ $(hash k3d) -eq 0 ]]; then
+        k3d cluster delete clusterName
+        if [ -f $KUBECONFIG ]; then
+            sudo chown $SUDO_USER:$SUDO_USER $KUBECONFIG
+        fi
+        exit $1
+    fi
+}
+
+trap 'clean $?' ERR SIGINT
+
 if [ $EUID -ne 0 ]; then
     exitWithMsg 1 "Run this as root or with sudo privilege."
 fi
-
-export KUBECONFIG=/home/$SUDO_USER/.kube/config
 
 basedir=$(cd $(dirname $0) && pwd)
 
@@ -44,12 +59,8 @@ if [ "$distroId" != "Ubuntu" ]; then
     exitWithMsg 1 "Unsupported Distro. This script is written for Ubuntu OS only."
 fi
 
-echo "Checking docker..."
-if [[ $(hash docker) -ne 0 ]]; then
-    echo "Docker not found. Installing."
-    sudo apt-get remove docker docker-engine docker.io containerd runc
-    sudo apt install docker.io
-    echo "Docker installed."
+if [ -f $KUBECONFIG ]; then
+    sudo chown root:root $KUBECONFIG
 fi
 
 echo
@@ -59,6 +70,14 @@ echo
 
 if [[ $nodeCount != ?(-)+([0-9]) ]]; then
     exitWithMsg 1 "$nodeCount is not a number. Number of worker node must be a number"
+fi
+
+echo "Checking docker..."
+if [[ $(hash docker) -ne 0 ]]; then
+    echo "Docker not found. Installing."
+    sudo apt-get remove docker docker-engine docker.io containerd runc
+    sudo apt install docker.io
+    echo "Docker installed."
 fi
 
 echo "Checking K3d..."
@@ -73,7 +92,7 @@ sleep 2
 echo
 echo "Creating cluster"
 echo
-k3d cluster create $clusterName --api-port 6550 --agents $nodeCount --k3s-arg "--disable=traefik@server:0" --k3s-arg "--disable=servicelb@server:0" --no-lb --wait
+k3d cluster create $clusterName --api-port 6550 --agents $nodeCount --k3s-arg "--disable=traefik@server:0" --k3s-arg "--disable=servicelb@server:0" --no-lb --wait --timeout 15m
 echo "Cluster $clusterName created."
 
 echo "Checking kubectl..."
@@ -102,6 +121,7 @@ echo "Waiting for MetalLB to be ready. It may take 10 seconds or more."
 kubectl wait --timeout=150s --for=condition=ready pod -l app=metallb,component=controller -n metallb-system
 sleep 5
 
+echo "Installing json parser."
 sudo apt install jq -y
 cidr_block=$(docker network inspect k3d-$clusterName | jq '.[0].IPAM.Config[0].Subnet' | tr -d '"')
 base_addr=${cidr_block%???}
@@ -143,6 +163,8 @@ kubectl wait --timeout=150s --for=condition=ready pod -l app=nginx -n sample-app
 
 sleep 5
 echo "Sample app is deployed."
+sudo chown $SUDO_USER:$SUDO_USER $KUBECONFIG
+k3d cluster list
 
 echo
 echo
