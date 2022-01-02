@@ -3,7 +3,10 @@ Spin-up a lightweight Kubernetes cluster on Ubuntu standalone VM with K3s, Metal
 
 ## Spin up a test Kubernetes cluster 
 
-```sudo bash spinup.sh```
+```
+curl -L https://raw.githubusercontent.com/navilg/spinup-k8s/master/spinup.sh -o spinup.sh
+sudo bash spinup.sh
+```
 
 - Enter cluster name once prompted.
 
