@@ -26,8 +26,8 @@ function clean()
     if [[ $(hash k3d) -eq 0 ]]; then
         sleep 2
         k3d cluster delete $clusterName
-        if [ -f $KUBECONFIG ]; then
-            sudo chown $SUDO_USER:$SUDO_USER $KUBECONFIG
+        if [ -d /home/$SUDO_USER/.kube ]; then
+            sudo chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.kube
         fi
         exit $1
     fi
@@ -68,8 +68,8 @@ if [ "$distroId" != "Ubuntu" ]; then
     exitWithMsg 1 "Unsupported Distro. This script is written for Ubuntu OS only."
 fi
 
-if [ -f $KUBECONFIG ]; then
-    sudo chown root:root $KUBECONFIG
+if [ -d /home/$SUDO_USER/.kube ]; then
+    sudo chown -R root:root /home/$SUDO_USER/.kube
 fi
 
 echo
@@ -189,8 +189,7 @@ kubectl wait --timeout=150s --for=condition=ready pod -l app=nginx -n sample-app
 
 sleep 5
 echo "Sample app is deployed."
-sudo chown $SUDO_USER:$SUDO_USER $KUBECONFIG
-k3d cluster list
+sudo chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.kube
 
 echo
 echo
@@ -202,6 +201,7 @@ echo "To stop this cluster (If running), run: k3d cluster stop $clusterName"
 echo "To start this cluster (If stopped), run: k3d cluster start $clusterName"
 echo "To delete this cluster, run: k3d cluster delete $clusterName"
 echo "To list all clusters, run: k3d cluster list"
+echo "To switch to another cluster (In case of multiple clusters), run: kubectl config use-context CLUSTERNAME"
 echo "---------------------------------------------------------------------------"
 echo "---------------------------------------------------------------------------"
 echo
