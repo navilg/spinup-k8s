@@ -12,17 +12,26 @@ function exitWithMsg()
     exit $1
 }
 
+function exitAfterCleanup()
+{
+    echo "Error $1: $2"
+    clean $1
+}
+
 function clean()
 {
     # $1 is error code
+    echo
     echo "Cleaning up, before exiting..."
     if [[ $(hash k3d) -eq 0 ]]; then
-        k3d cluster delete clusterName
+        sleep 2
+        k3d cluster delete $clusterName
         if [ -f $KUBECONFIG ]; then
             sudo chown $SUDO_USER:$SUDO_USER $KUBECONFIG
         fi
         exit $1
     fi
+    exit $1
 }
 
 trap 'clean $?' ERR SIGINT
@@ -66,11 +75,21 @@ fi
 echo
 read -p "Enter cluster name: " clusterName
 read -p "Enter number of worker nodes (0 to 3) (1Gi memory per node is required): " nodeCount
+read -p "Enter kubernetes api port (recommended: 5000-5500): " apiPort
 echo
+
+if [[ $apiPort != ?(-)+([0-9]) ]]; then
+    exitWithMsg 1 "$apiPort is not a port. Port must be a number"
+fi
 
 if [[ $nodeCount != ?(-)+([0-9]) ]]; then
     exitWithMsg 1 "$nodeCount is not a number. Number of worker node must be a number"
 fi
+
+echo
+echo "Updating apt packages."
+sudo apt update
+echo
 
 echo "Checking docker..."
 if [[ $(hash docker) -ne 0 ]]; then
@@ -90,9 +109,16 @@ fi
 sleep 2
 
 echo
+echo "Checking if cluster already exists."
+hasCluster=$(k3d cluster list | grep -w $clusterName | cut -d " " -f 1)
+if [ "$hasCluster" == "$clusterName" ]; then
+    exitWithMsg 100 "Cluster with name $clusterName already exist."
+fi
+
+echo
 echo "Creating cluster"
 echo
-k3d cluster create $clusterName --api-port 6550 --agents $nodeCount --k3s-arg "--disable=traefik@server:0" --k3s-arg "--disable=servicelb@server:0" --no-lb --wait --timeout 15m
+k3d cluster create $clusterName --api-port $apiPort --agents $nodeCount --k3s-arg "--disable=traefik@server:0" --k3s-arg "--disable=servicelb@server:0" --no-lb --wait --timeout 15m
 echo "Cluster $clusterName created."
 
 echo "Checking kubectl..."
@@ -109,7 +135,7 @@ sleep 2
 kubectl cluster-info
 
 if [ $? -ne 0 ]; then
-    exitWithMsg 1 "Failed to spinup cluster."
+    exitAfterCleanup 1 "Failed to spinup cluster."
 fi
 
 echo
