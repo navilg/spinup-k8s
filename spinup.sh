@@ -44,6 +44,8 @@ kubectlVersion="v1.22.2"
 metallbVersion="v0.10.3"
 ingressControllerVersion="v1.0.4"
 
+k3dclusterinfo="/home/$SUDO_USER/k3dclusters.info"
+
 totalMem=$(free --giga | grep -w Mem | tr -s " "  | cut -d " " -f 2)
 
 usedMem=$(free --giga | grep -w Mem | tr -s " "  | cut -d " " -f 3)
@@ -188,19 +190,28 @@ sleep 5
 echo "Sample app is deployed."
 sudo chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.kube
 
-echo
-echo
-echo "---------------------------------------------------------------------------"
-echo "---------------------------------------------------------------------------"
-echo "Ingress Load Balancer: $externalIP"
-echo "Open sample app in browser: http://$externalIP/sampleapp"
-echo "To stop this cluster (If running), run: k3d cluster stop $clusterName"
-echo "To start this cluster (If stopped), run: k3d cluster start $clusterName"
-echo "To delete this cluster, run: k3d cluster delete $clusterName"
-echo "To list all clusters, run: k3d cluster list"
-echo "To switch to another cluster (In case of multiple clusters), run: kubectl config use-context k3d-<CLUSTERNAME>"
-echo "---------------------------------------------------------------------------"
-echo "---------------------------------------------------------------------------"
-echo
+function clusterInfo()
+{
+    echo
+    echo
+    echo "---------------------------------------------------------------------------"
+    echo "---------------------------------------------------------------------------"
+    echo "Cluster name: $clusterName"
+    echo "K8s server: https://0.0.0.0:$apiPort"
+    echo "Ingress Load Balancer: $externalIP"
+    echo "Open sample app in browser: http://$externalIP/sampleapp"
+    echo "To stop this cluster (If running), run: k3d cluster stop $clusterName"
+    echo "To start this cluster (If stopped), run: k3d cluster start $clusterName"
+    echo "To delete this cluster, run: k3d cluster delete $clusterName"
+    echo "To list all clusters, run: k3d cluster list"
+    echo "To switch to another cluster (In case of multiple clusters), run: kubectl config use-context k3d-<CLUSTERNAME>"
+    echo "---------------------------------------------------------------------------"
+    echo "---------------------------------------------------------------------------"
+    echo
+}
+clusterInfo | tee -a "$k3dclusterinfo"
+chown $SUDO_USER:$SUDO_USER "$k3dclusterinfo"
+chmod 400 "$k3dclusterinfo"
+echo "Find cluster info in "$k3dclusterinfo" file."
 echo "|-- THANK YOU --|"
 echo
