@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-set -e
-
 export KUBECONFIG=/home/$SUDO_USER/.kube/config
 
 function exitWithMsg()
@@ -23,13 +21,12 @@ function clean()
     # $1 is error code
     echo
     echo "Cleaning up, before exiting..."
-    if [[ $(hash k3d) -eq 0 ]]; then
+    if [[ "$(which k3d)" != "" ]]; then
         sleep 2
         k3d cluster delete $clusterName
-        if [ -d /home/$SUDO_USER/.kube ]; then
-            sudo chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.kube
-        fi
-        exit $1
+    fi
+    if [ -d /home/$SUDO_USER/.kube ]; then
+        sudo chown -R $SUDO_USER:$SUDO_USER /home/$SUDO_USER/.kube
     fi
     exit $1
 }
@@ -92,7 +89,7 @@ sudo apt update
 echo
 
 echo "Checking docker..."
-if [[ $(hash docker) -ne 0 ]]; then
+if [[ "$(which docker)" == "" ]]; then
     echo "Docker not found. Installing."
     sudo apt-get remove docker docker-engine docker.io containerd runc
     sudo apt install docker.io
@@ -100,9 +97,9 @@ if [[ $(hash docker) -ne 0 ]]; then
 fi
 
 echo "Checking K3d..."
-if [[ $(hash k3d) -ne 0 ]]; then
+if [[ "$(which k3d)" == "" ]]; then
     echo "K3d not found. Installing."
-    curl -s https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=$k3dVersion bash
+    curl -LO https://raw.githubusercontent.com/rancher/k3d/main/install.sh | TAG=$k3dVersion bash
     echo "K3d installed."
 fi
 
@@ -122,7 +119,7 @@ k3d cluster create $clusterName --api-port $apiPort --agents $nodeCount --k3s-ar
 echo "Cluster $clusterName created."
 
 echo "Checking kubectl..."
-if [[ $(hash kubectl) -ne 0 ]]; then
+if [[ "$(which kubectl)" == "" ]]; then
     echo "kubectl not found. Installing."
     curl -LO https://dl.k8s.io/release/$kubectlVersion/bin/linux/amd64/kubectl
     chmod +x kubectl
@@ -173,7 +170,7 @@ echo
 echo "Deploying Nginx Ingress Controller."
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-$ingressControllerVersion/deploy/static/provider/aws/deploy.yaml
 echo "Waiting for Nginx Ingress controller to be ready. It may take 10 seconds or more."
-kubectl wait --timeout=150s  --for=condition=ready pod -l app.kubernetes.io/component=controller,app.kubernetes.io/instance=ingress-nginx -n ingress-nginx
+kubectl wait --timeout=180s  --for=condition=ready pod -l app.kubernetes.io/component=controller,app.kubernetes.io/instance=ingress-nginx -n ingress-nginx
 
 sleep 5
 
