@@ -139,7 +139,7 @@ fi
 echo
 echo "Creating cluster"
 echo
-k3d cluster create $clusterName --api-port $apiPort --agents $nodeCount --k3s-arg "--disable=traefik@server:0" --k3s-arg "--disable=servicelb@server:0" --no-lb --wait --timeout 15m
+k3d cluster create $clusterName --image rancher/k3s:v1.23.6-k3s1 --api-port $apiPort --agents $nodeCount --k3s-arg "--disable=traefik@server:0" --k3s-arg "--disable=servicelb@server:0" --no-lb --wait --timeout 15m
 echo "Cluster $clusterName created."
 
 echo "Checking kubectl..."
