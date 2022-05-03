@@ -62,6 +62,7 @@ fi
 basedir=$(cd $(dirname $0) && pwd)
 
 k3dVersion="v5.4.1"
+k3sversion="v1.23.6-k3s1"
 kubectlVersion="v1.23.4"
 metallbVersion="v0.10.3"
 ingressControllerVersion="v1.0.4"
@@ -139,7 +140,7 @@ fi
 echo
 echo "Creating cluster"
 echo
-k3d cluster create $clusterName --image rancher/k3s:v1.23.6-k3s1 --api-port $apiPort --agents $nodeCount --k3s-arg "--disable=traefik@server:0" --k3s-arg "--disable=servicelb@server:0" --no-lb --wait --timeout 15m
+k3d cluster create $clusterName --image rancher/k3s:$k3sversion --api-port $apiPort --agents $nodeCount --k3s-arg "--disable=traefik@server:0" --k3s-arg "--disable=servicelb@server:0" --no-lb --wait --timeout 15m
 echo "Cluster $clusterName created."
 
 echo "Checking kubectl..."
