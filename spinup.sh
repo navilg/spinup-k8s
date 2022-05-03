@@ -61,8 +61,8 @@ fi
 
 basedir=$(cd $(dirname $0) && pwd)
 
-k3dVersion="v5.0.1"
-kubectlVersion="v1.22.2"
+k3dVersion="v5.4.1"
+kubectlVersion="v1.23.4"
 metallbVersion="v0.10.3"
 ingressControllerVersion="v1.0.4"
 
