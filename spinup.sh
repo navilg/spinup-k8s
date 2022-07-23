@@ -178,6 +178,7 @@ echo
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$metallbVersion/manifests/namespace.yaml
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$metallbVersion/manifests/metallb.yaml
 echo "Waiting for MetalLB to be ready. It may take 10 seconds or more."
+sleep 5
 kubectl wait --timeout=150s --for=condition=ready pod -l app=metallb,component=controller -n metallb-system
 sleep 5
 
@@ -207,6 +208,7 @@ echo
 echo "Deploying Nginx Ingress Controller."
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-$ingressControllerVersion/deploy/static/provider/aws/deploy.yaml
 echo "Waiting for Nginx Ingress controller to be ready. It may take 10 seconds or more."
+sleep 5
 kubectl wait --timeout=180s  --for=condition=ready pod -l app.kubernetes.io/component=controller,app.kubernetes.io/instance=ingress-nginx -n ingress-nginx
 
 sleep 5
@@ -219,6 +221,7 @@ echo
 echo "Deploying a sample app."
 kubectl apply -f https://raw.githubusercontent.com/navilg/spinup-k8s/master/sample-app.yaml
 echo "Waiting for sample application to be ready. It may take 10 seconds or more."
+sleep 5
 kubectl wait --timeout=150s --for=condition=ready pod -l app=nginx -n sample-app
 
 sleep 5
