@@ -95,10 +95,22 @@ if [ -d /home/$SUDO_USER/.kube ]; then
 fi
 
 echo
-read -p "Enter cluster name: " clusterName
-read -p "Enter number of worker nodes (0 to 3) (1Gi memory per node is required): " nodeCount
-read -p "Enter kubernetes api port (recommended: 5000-5500): " apiPort
+read -p "Enter cluster name [ Default: linuxshots-RANDOMDIGITS ]: " clusterName
+read -p "Enter number of worker nodes (0 to 3) (1Gi memory per node is required) [ Default: 0 ]: " nodeCount
+read -p "Enter kubernetes api port (recommended: 5000-5500) [ Default: 5000 ]: " apiPort
 echo
+
+if [ -z $clusterName ]; then
+    clusterName=linuxshots-$(head -n 100 /dev/urandom | tr -dc 0-9 | cut -c 1-6)
+fi
+
+if [ -z $apiPort ]; then
+    apiPort=5000
+fi
+
+if [ -z $nodeCount ]; then
+    nodeCount=0
+fi
 
 if [[ $apiPort != ?(-)+([0-9]) ]]; then
     exitWithMsg 1 "$apiPort is not a port. Port must be a number"
