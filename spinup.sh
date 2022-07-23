@@ -77,7 +77,7 @@ availableMem=$(expr $totalMem - $usedMem)
 
 echo "Available Memory: "$availableMem"Gi"
 
-distroId=$(grep -w DISTRIB_ID /etc/*-release | cut -d "=" -f 2)
+distroId=$(grep -w ID_LIKE /etc/os-release | cut -d "=" -f 2)
 distroVersion=$(grep -w DISTRIB_RELEASE /etc/*-release | cut -d "=" -f 2)
 
 echo "Distro: $distroId:$distroVersion"
@@ -86,8 +86,8 @@ if [ $availableMem -lt 2 ]; then
     exitWithMsg 1 "Atleast 2Gi of free memory required."
 fi
 
-if [ "$distroId" != "Ubuntu" ]; then
-    exitWithMsg 1 "Unsupported Distro. This script is written for Ubuntu OS only."
+if [ "$distroId" != "ubuntu" -a "$distroId" != "debian" ]; then
+    exitWithMsg 1 "Unsupported Distro. This script is written for Debian-based OS only."
 fi
 
 if [ -d /home/$SUDO_USER/.kube ]; then
