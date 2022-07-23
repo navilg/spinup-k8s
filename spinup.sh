@@ -178,7 +178,7 @@ echo
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$metallbVersion/manifests/namespace.yaml
 kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$metallbVersion/manifests/metallb.yaml
 echo "Waiting for MetalLB to be ready. It may take 10 seconds or more."
-sleep 5
+sleep 10
 kubectl wait --timeout=150s --for=condition=ready pod -l app=metallb,component=controller -n metallb-system
 sleep 5
 
