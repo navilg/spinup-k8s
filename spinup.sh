@@ -179,8 +179,7 @@ fi
 echo
 echo "Deploying MetalLB loadbalancer."
 echo
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$metallbVersion/manifests/namespace.yaml
-kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$metallbVersion/manifests/metallb.yaml
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/$metallbVersion/config/manifests/metallb-native.yaml
 echo "Waiting for MetalLB to be ready. It may take 10 seconds or more."
 sleep 10
 kubectl wait --timeout=150s --for=condition=ready pod -l app=metallb,component=controller -n metallb-system
