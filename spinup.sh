@@ -136,7 +136,8 @@ fi
 echo "Checking K3d..."
 if [[ "$(which k3d)" == "" ]]; then
     echo "K3d not found. Installing."
-    curl -LO https://raw.githubusercontent.com/rancher/k3d/main/install.sh | sudo TAG=$k3dVersion bash
+    curl -LO https://raw.githubusercontent.com/rancher/k3d/main/install.sh
+    sudo TAG=$k3dVersion bash install.sh
     echo "K3d installed."
     exec bash
 fi
