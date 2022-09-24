@@ -61,11 +61,11 @@ fi
 
 basedir=$(cd $(dirname $0) && pwd)
 
-k3dVersion="v5.4.1"
-k3sversion="v1.23.6-k3s1"
-kubectlVersion="v1.23.4"
-metallbVersion="v0.10.3"
-ingressControllerVersion="v1.0.4"
+k3dVersion="v5.4.5"
+k3sversion="v1.24.3-k3s1"
+kubectlVersion="v1.24.4"
+metallbVersion="v0.13.4"
+ingressControllerVersion="v1.2.1"
 
 k3dclusterinfo="/home/$SUDO_USER/k3dclusters.info"
 
