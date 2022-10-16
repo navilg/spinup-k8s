@@ -192,6 +192,9 @@ base_addr=${cidr_block%???}
 first_addr=$(echo $base_addr | awk -F'.' '{print $1,$2,$3,240}' OFS='.')
 range=$first_addr/29
 
+echo "Waiting for metallb webhook to be ready..."
+sleep 15
+
 cat <<EOF | kubectl apply -f -
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
