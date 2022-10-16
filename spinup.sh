@@ -141,7 +141,6 @@ if [[ "$(which k3d)" == "" ]]; then
     TAG=$k3dVersion 
     sudo bash install.sh
     echo "K3d installed."
-    exec bash
 fi
 
 sleep 2
