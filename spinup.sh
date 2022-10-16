@@ -193,18 +193,14 @@ first_addr=$(echo $base_addr | awk -F'.' '{print $1,$2,$3,240}' OFS='.')
 range=$first_addr/29
 
 cat <<EOF | kubectl apply -f -
-apiVersion: v1
-kind: ConfigMap
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
 metadata:
+  name: lb-ip-pool
   namespace: metallb-system
-  name: config
-data:
-  config: |
-    address-pools:
-    - name: default
-      protocol: layer2
-      addresses:
-      - $range
+spec:
+  addresses:
+  - $range
 EOF
 
 echo
